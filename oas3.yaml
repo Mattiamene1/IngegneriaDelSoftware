@@ -1,0 +1,860 @@
+openapi: 3.0.0
+info:
+  version: '1.0'
+  title: "Ingegneria del software OpenAPI 3.0"
+  description: API del progetto relativo al corso di ingegneria del software.
+  license:
+    name: MIT
+servers:
+  - url: http://localhost:3000/api/v1
+    description: Localhost
+            
+paths:
+  /maf:
+    post:
+      description: Registra un nuovo MAF nella piattaforma
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required:
+                - nome
+                - cognome
+                - codiceFiscale
+                - email
+              properties:
+                nome:
+                  type: string
+                  description: 'Nome del MAF'
+                cognome:
+                  type: string
+                  description: 'Cognome del MAF'
+                codiceFiscale:
+                  type: string
+                  description: 'Codice fiscale del MAF'
+                email:
+                  type: string
+                  description: 'Indirizzo email del MAF, utilizzato per il login'
+      responses:
+        '201':
+          description: 'MAF creato. Locazione della risorsa nel campo self'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RispostaJSON'
+        '400':
+          description: 'Non sono stati specificati i parametri obbligatori nel corpo della richiesta'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RispostaJSON'
+        '409':
+          description: 'È già presente un MAF registrato nel sistema oppure l''indirizzo e-mail o il codice fiscale inseriti sono già presenti nell''elenco degli utenti. Non è possibile procedere alla creazione di un ulteriore MAF'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RispostaJSON'
+        '500':
+          description: 'Errore nel salvataggio dei dati nel database. Il MAF non è stato creato'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RispostaJSON'
+    get:
+      description: Esegui il login per il MAF alla piattaforma
+      
+      parameters:
+        - in: header
+          name: X-Access-Token
+          description: Token JWT fornito da Firebase (nel frontend è memorizzato in un cookie)
+          schema:
+            type: string
+            format: string
+          required: true
+
+      responses:
+        '202':
+          description: 'MAF loggato.' 
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RispostaJSON'
+        '400':
+          description: 'Token mancante nella richiesta'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RispostaJSON'
+        '401':
+          description: 'Indirizzo e-mail utente non riconosciuto'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RispostaJSON'
+        '403':
+          description: 'Indirizzo e-mail utente riconosciuto, ma non è Manager di Federazione'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RispostaJSON'
+        '500':
+          description: 'Errore durante il controllo del token'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RispostaJSON'
+  
+  
+  /setuptorneo:
+    post:
+      description: Crea un nuovo torneo con i parametri passati nella richiesta
+      
+      parameters:
+        - in: header
+          name: X-Access-Token
+          description: Token JWT fornito da Firebase (nel frontend è memorizzato in un cookie)
+          schema:
+            type: string
+            format: string
+          required: true
+          
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Torneo'
+      
+      responses:
+        '201':
+            description: 'Torneo creato correttamente.' 
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/RispostaJSON'
+                  
+        '400':
+          description: 'Token mancante nella richiesta o campi necessari alla creazione torneo mancanti'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RispostaJSON'
+        '401':
+          description: 'Indirizzo e-mail utente non riconosciuto'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RispostaJSON'
+        '403':
+          description: 'Indirizzo e-mail utente riconosciuto, ma non è Manager di Federazione'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RispostaJSON'
+        '412':
+          description: 'Utente non autorizzato'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RispostaJSON' 
+        '500':
+          description: 'Errore durante il controllo del token o errore durante il salvataggio del torneo'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RispostaJSON'
+          
+      
+            
+            
+      
+                
+  /arbitro:
+    get:
+      description: Esegui il login dell'arbitro alla piattaforma
+      
+      parameters:
+        - in: header
+          name: X-Access-Token
+          description: Token JWT fornito da Firebase (nel frontend è memorizzato in un cookie)
+          schema:
+            type: string
+            format: string
+          required: true
+
+      responses:
+        '202':
+          description: 'Arbitro loggato.' 
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RispostaJSON'
+        '400':
+          description: 'Token mancante nella richiesta'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RispostaJSON'
+        '401':
+          description: 'Indirizzo e-mail utente non riconosciuto'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RispostaJSON'
+        '403':
+          description: 'Indirizzo e-mail utente riconosciuto, ma non è arbitro'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RispostaJSON'
+        '500':
+          description: 'Errore durante il controllo del token'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RispostaJSON'
+    post:
+      description: Registra un nuovo arbitro nella piattaforma
+      
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required:
+                - nome
+                - cognome
+                - codiceFiscale
+                - email
+              properties:
+                nome:
+                  type: string
+                  description: 'Nome dell''arbitro'
+                cognome:
+                  type: string
+                  description: 'Cognome del''arbitro'
+                codiceFiscale:
+                  type: string
+                  description: 'Codice fiscale del''arbitro'
+                email:
+                  type: string
+                  description: 'Indirizzo email del''arbitro, utilizzato per il login'
+                sezione:
+                  type: string
+                  description: 'Sezione'
+                codicePatentino:
+                  type: string
+                  description: 'Codice patentino'
+      responses:
+        '201':
+          description: 'Arbitro creato. Locazione della risorsa nel campo self'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RispostaJSON'
+        '400':
+          description: 'Non sono stati specificati i parametri obbligatori nel corpo della richiesta'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RispostaJSON'
+        '409':
+          description: 'L''indirizzo e-mail o il codice fiscale inseriti sono già presenti nell''elenco degli utenti. Non è possibile salvare l''arbitro'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RispostaJSON'
+        '500':
+          description: 'Errore nel salvataggio dei dati nel database. Il MAF non è stato creato'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RispostaJSON'
+    
+  /avviatorneo:
+    put:
+      description: Aggiorna lo stato del torneo creato
+      parameters:
+        - in: header
+          name: X-Access-Token
+          description: Token JWT fornito da Firebase (nel frontend è memorizzato in un cookie)
+          schema:
+            type: string
+            format: string
+          required: true
+          
+      responses:
+        '201':
+          description: Stato del torneo aggiornato
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RispostaJSON'
+        '400':
+          description: token autenticazione mancante
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RispostaJSON'
+        '406':
+          description: Non esiste un torneo, o esiste ma non è in stato "creato"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RispostaJSON'
+        '412':
+          description: 'Utente non autorizzato'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RispostaJSON' 
+        '500':
+          description: Errore durante l'aggiornamento dei dati nel database. Torneo non aggiornato
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RispostaJSON'
+  /arbitri:
+    get:
+      description: Elenco degli arbitri registrati con possibilità di filtrare in base allo stato di approvazione
+      parameters:
+        - name: approvato
+          description: Se visualizzare solo gli arbitri da approvare o quelli già approvati
+          in: query
+          required: false
+      responses:
+        '200':
+          description: 'Elenco degli arbitri inseriti nel sistema'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RispostaJSON'
+  /arbitri/{_id}/approva:
+    put:
+      description: Approva arbitro
+      parameters:
+        - name: _id
+          description: Identificativo dell'arbitro da approvare
+          in: path
+          required: true
+      responses:
+        '403':
+          description: 'L''utente autenticato non è un MAF, pertanto non può procedere all''approvazione'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RispostaJSON'
+        '200':
+          description: 'Arbitro approvato'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RispostaJSON'
+  /squadra:
+    post:
+      description: Registra una nuova squadra con i suoi giocatori
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+           schema:
+              type: object
+              required:
+                - nome
+                - girone
+                - giocatori
+              properties:
+                nome:
+                  type: string
+                  description: Nome della squadra
+                girone:
+                  type: number
+                  description: Girone in cui la squadra giocherà
+                giocatori:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/Utente'
+      responses:
+        '200':
+          description: Squadra inserita correttamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RispostaJSON'
+        '400':
+          description: 'Nome squadra o girone non presenti nella richiesta, oppure numero giocatori non valido (deve essere compreso tra 5 e 10)'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RispostaJSON'
+        '409':
+          description: 'Squadra con lo stesso nome già registrata oppure giocatori inseriti già iscritti nella piattaforma o duplicati nella richiesta'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RispostaJSON'
+  
+  /giocatore/{id}:
+    get:
+      description: Ottieni le informazioni di un giocatore dato il suo id
+      parameters:
+        - name: id
+          description: Identificativo del giocatore da inviare
+          in: path
+          required: true
+      
+      responses:
+        '406':
+          description: 'codice giocatore non presente nella richiesta'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RispostaJSON'
+        '401':
+          description: 'Il codice fornito non appartiene ad un giocatore'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RispostaJSON'
+        '200':
+          description: 'restituisco il giocatore'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Utente'
+                
+                
+  /squadre/{id}/approva:
+    put:
+      description: approva una squadra al torneo
+      parameters:
+        - name: id
+          description: Identificativo della squadra da approvare
+          in: path
+          required: true
+        - in: header
+          name: X-Access-Token
+          description: Token JWT fornito da Firebase (nel frontend è memorizzato in un cookie)
+          schema:
+            type: string
+            format: string
+          required: true
+      
+      responses:
+        '400':
+          description: 'Squadra o token autenticazione non presente nella richiesta'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RispostaJSON'
+        '401':
+          description: 'Utente non valido, email non riconosciuta'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RispostaJSON'
+        '403':
+          description: 'Non è più possibile aggiungere squadre'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RispostaJSON'
+        '406':
+          description: 'Nessun un torneo attivo in questo momento'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RispostaJSON'
+        '412':
+          description: 'Utente non autorizzato'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RispostaJSON' 
+        '500':
+          description: 'Errore nel processo di autenticazione'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RispostaJSON'
+        '200':
+          description: 'restituisco il giocatore'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RispostaJSON'
+                
+                
+  /mostraiscrizionisquadre:
+    get:
+      description: approva una squadra al torneo
+      parameters:
+        - in: header
+          name: X-Access-Token
+          description: Token JWT fornito da Firebase (nel frontend è memorizzato in un cookie)
+          schema:
+            type: string
+            format: string
+          required: true
+      responses:
+        '400':
+          description: 'Token autenticazione non presente nella richiesta'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RispostaJSON'
+        '401':
+          description: 'Utente non valido, email non riconosciuta'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RispostaJSON'
+
+        '403':
+          description: 'Nessun torneo attivo in questo momento'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RispostaJSON'
+        '406':
+          description: 'Nessuna iscrizione al momento'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RispostaJSON'
+        '412':
+          description: 'Utente non autorizzato'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RispostaJSON' 
+        '500':
+          description: 'Errore nel processo di autenticazione'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RispostaJSON'
+        '200':
+          description: 'restituisco il giocatore'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Utente'
+                
+  /partite:
+    get:
+      description: mostra partite da disputare
+      parameters:
+        - name: id
+          description: Identificativo della squadra di arbitro, squadra casa e ospite da mostrare
+          in: path
+          required: true
+      responses:
+        '400':
+          description: 'Errore nei dati della partita'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RispostaJSON'
+        '406':
+          description: 'Nessuna partita al momento'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RispostaJSON'
+      
+        '200':
+          description: 'restituisco le partite'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Partita'
+  
+  /partita:
+    post:
+      description: Crea una nuova partita con i parametri passati nella richiesta
+      
+      parameters:
+        - in: header
+          name: X-Access-Token
+          description: Token JWT fornito da Firebase (nel frontend è memorizzato in un cookie)
+          schema:
+            type: string
+            format: string
+          required: true
+          
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Partita'
+      
+      responses:
+        '400':
+          description: 'Squadra di casa, o squadra ospite o arbitro non validi'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RispostaJSON'
+        '403':
+          description: 'Dati mancanti nella richiesta'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RispostaJSON'
+        '409':
+          description: 'Conflitto con partita esistente'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RispostaJSON'
+        
+        '500':
+          description: 'Errore durante il salvataggio della partita'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RispostaJSON'
+      
+        '200':
+          description: 'Partita creata con successo'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RispostaJSON'
+                
+  /inserimentoreferti:
+    post:
+      description: 'Inserimento del referto della partita da disputare'
+      parameters:
+        - in: header
+          name: X-Access-Token
+          description: Token JWT fornito da Firebase (nel frontend è memorizzato in un cookie)
+          schema:
+            type: string
+            format: string
+          required: true
+      
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Referto'
+              
+      responses:
+        '400':
+          description: 'Partita non indicata nella richiesta'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RispostaJSON'
+        '400':
+          description: 'Referto già esistente'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RispostaJSON'
+        '403':
+          description: 'Dati dei gol segnati mancanti'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RispostaJSON'
+        '403':
+          description: 'Numero di marcatori totali diverso dai gol totali'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RispostaJSON'
+        '403':
+          description: 'La partita di tabellone finale non può terminare in pareggio'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RispostaJSON'
+        '500':
+          description: 'Errore durante il salvataggio del Referto'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RispostaJSON'
+        '200':
+          description: 'Referto salvato e aggiornati i dati giocatore e squadra correttamente'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RispostaJSON'
+  /squadra/{id}:
+    get:
+      description: Ottieni le informazioni di una squadra dato il suo id
+      parameters:
+        - name: id
+          description: Identificativo della squadra da inviare
+          in: path
+          required: true
+      responses:
+        '406':
+          description: 'Codice squadra non presente nella richiesta'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RispostaJSON'
+        '401':
+          description: 'Il codice fornito non appartiene ad una squadra'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RispostaJSON'
+        '200':
+          description: 'Restituisco la squadra'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RispostaJSON'
+components:
+ schemas:
+    RispostaJSON:
+      type: object
+      required:
+        - success
+      properties:
+        success:
+          type: boolean
+        data:
+          type: array
+          additionalProperties: false
+        error:
+          type: string
+        self:
+          type: string
+    Utente:
+      type: object
+      required:
+        - nome
+        - cognome
+        - codiceFiscale
+        - email
+        - ruolo
+      properties:
+        _id:
+          type: string
+          description: 'Identificativo univoco dell''utente'
+        nome:
+          type: string
+          description: 'Nome'
+        cognome:
+          type: string
+          description: 'Cognome'
+        codiceFiscale:
+          type: string
+          description: 'Codice fiscale'
+        email:
+          type: string
+          description: 'Indirizzo email. Viene utilizzato per il login'
+        ruolo:
+          type: string
+          description: 'Ruolo del''utente. Può essere: manager, arbitro o giocatore'
+          enum:
+          - manager
+          - arbitro
+          - giocatore
+        stato:
+          type: string
+          description: 'Stato dell''utente di tipo giocatore'
+          enum:
+          - in_attesa
+          - approvato
+          - sostituito
+        sezione:
+          type: string
+          description: 'Sezione dell''utente di tipo arbitro'
+        codicePatentino:
+          type: string
+          description: 'Codice patentino dell''utente di tipo arbitro'
+        approvato:
+          type: boolean
+          description: 'Stato di approvazione dell''utente di tipo arbitro'
+    Giocatore:
+      allOf:
+      - $ref: '#/components/schemas/Utente'
+      - type: object
+        required:
+          - nome
+          - cognome
+          - codiceFiscale
+          - email
+    Torneo:
+      type: object
+      required:
+        - numero_gironi
+        - numero_squadre
+        - squadre_per_girone
+        - alle_fasi_finali
+      properties:
+        numero_gironi:
+          type: integer
+          description: numero di gironi che compongono il torneo
+          enum:
+          - 4
+          - 8
+        numero_squadre:
+          type: integer
+          description: numero delle squadre che possono partecipare al torneo
+        squadre_per_girone:
+          type: integer
+          description: numero di squadre che compongono ogni girone
+        alle_fase_finali:
+          type: integer
+          description: numero di squadre che per ogni girone accedono alle fasi finali
+          enum:
+          - 1
+          - 2
+    Partita:
+      type: object
+      required:
+        - casa
+        - ospite
+        - luogo
+        - data
+        - arbitro
+      properties:
+        casa:
+          type: string
+          description: 'Nome della squadra di casa'
+        ospite: 
+          type: string
+          description: 'Nome della squadra ospite'
+        luogo:
+          type: string
+          description: 'Nome dello stadio o Nome del luogo'
+        data:
+          type: string
+          description: 'Data della partita' 
+        arbitro:
+          type: string
+          description: 'Nome dell arbitro che dirigerà la partita'
+    Referto:
+      type: object
+      required:
+        - partitaRiferimento
+        - goalCasa
+        - goalOspite
+        - marcatori
+      properties:
+        partitaRiferimento:
+          type: string
+          description: 'ID della partita in riferimento'
+        goalCasa:
+          type: integer
+          description: 'Numero goal segnati dalla squadra di casa'
+        goalOspite:
+          type: integer
+          description: 'Numero goal segnati dalla squadra ospite'
+        marcatori:
+          type: array
+          description: 'Lista giocatori che hanno segnato in questa partita'

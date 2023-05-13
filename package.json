@@ -1,0 +1,41 @@
+{
+  "name": "progetto_ids",
+  "version": "1.0.0",
+  "description": "progetto ingegneria del software",
+  "main": "server.js",
+  "scripts": {
+    "test": "jest --setupFiles dotenv/config",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MrcXausa/IngegneriaDelSoftware.git"
+  },
+  "author": "Marco Xausa",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/MrcXausa/IngegneriaDelSoftware/issues"
+  },
+  "homepage": "https://github.com/MrcXausa/IngegneriaDelSoftware#readme",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.1",
+    "express": "^4.18.1",
+    "firebase-admin": "^10.2.0",
+    "mongoose": "^6.3.3",
+    "nodemon": "^2.0.16",
+    "swagger-jsdoc": "^6.2.1",
+    "swagger-ui-express": "^4.4.0",
+    "yamljs": "^0.3.0"
+  },
+  "devDependencies": {
+    "firebase": "^9.8.2",
+    "jest": "^28.1.0",
+    "node-fetch": "^2.6.7",
+    "supertest": "^6.2.3"
+  },
+  "jest": {
+    "verbose": true,
+    "collectCoverage": true
+  }
+}
